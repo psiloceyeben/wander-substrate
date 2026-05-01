@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Data — substantial size, deployment-specific, regenerable
+data/
+!data/.gitkeep
+
+# Logs
+*.log
+
+# Local environment / secrets
+.env
+.env.local
+*.local
+
+# OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Generated
+*.tmp
+*.bak
+
+# Vendored Three.js — large, optional. Uncomment if you want to vendor instead of fetching.
+# static/three.module.js
+# static/OrbitControls.js
+# static/PointerLockControls.js

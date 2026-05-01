@@ -1,0 +1,30 @@
+[Unit]
+Description=Wander Around API (FastAPI on 127.0.0.1:8050)
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/wander
+Environment=PYTHONPATH=/root/wander/src
+ExecStart=/usr/bin/python3 -m uvicorn api.main:app --host 127.0.0.1 --port 8050 --no-server-header --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=always
+RestartSec=5
+LimitNOFILE=4096
+
+# ── Hardening ─────────────────────────────────────────────────────────
+# Note: ProtectHome=true would block /root; we run from /root/wander, so leave it off.
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/root/wander/data /root/wander/logs
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+
+[Install]
+WantedBy=multi-user.target

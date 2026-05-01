@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily category-edges precompute (chord graph data)
+
+[Timer]
+# Fire 30 min after boot the first time, then once every 24 hours.
+OnBootSec=30min
+OnUnitActiveSec=24h
+RandomizedDelaySec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

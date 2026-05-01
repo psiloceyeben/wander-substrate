@@ -1,0 +1,20 @@
+[Unit]
+Description=Wander wiki thumb renderer (Playwright on en.wikipedia.org)
+Documentation=Renders 320×480 WebP screenshots of Wikipedia article pages and writes thumb_path back to articles table. Modest parallelism (2) to stay under Wikimedia rate limits.
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/wander
+ExecStart=/usr/bin/python3 /root/wander/scripts/wiki/05_wiki_thumb_render.py --parallelism 2 --batch-size 10 --timeout-ms 15000
+Restart=on-failure
+RestartSec=30
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=6
+MemoryMax=4G
+StandardOutput=append:/root/wander/data/wiki/thumbs.log
+StandardError=append:/root/wander/data/wiki/thumbs.log
+
+[Install]
+WantedBy=multi-user.target

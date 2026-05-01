@@ -1,0 +1,13 @@
+[Unit]
+Description=Wander category-edges precompute (daily heavy SQL job)
+Documentation=Inter-category linkage matrix for /game chord graph type. Reads link_edges (9.5M rows) join cards (4M), takes ~2-5 min wall time, writes data/category_edges.json. Runs at low priority and idle IO so it never starves the API.
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/wander
+Nice=19
+IOSchedulingClass=idle
+ExecStart=/usr/bin/python3 /root/wander/scripts/16_compute_category_edges.py
+StandardOutput=append:/root/wander/data/category_edges.log
+StandardError=append:/root/wander/data/category_edges.log
