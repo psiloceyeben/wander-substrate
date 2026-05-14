@@ -5,9 +5,11 @@ After=network.target
 
 [Service]
 Type=oneshot
-WorkingDirectory=/root/wander
+User=wander
+Group=wander
+WorkingDirectory=/opt/wander
 Nice=19
 IOSchedulingClass=idle
-ExecStart=/usr/bin/python3 /root/wander/scripts/16_compute_category_edges.py
-StandardOutput=append:/root/wander/data/category_edges.log
-StandardError=append:/root/wander/data/category_edges.log
+ExecStart=/usr/bin/python3 /opt/wander/scripts/16_compute_category_edges.py
+StandardOutput=append:/opt/wander/data/category_edges.log
+StandardError=append:/opt/wander/data/category_edges.log

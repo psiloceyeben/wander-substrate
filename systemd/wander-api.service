@@ -3,19 +3,24 @@ Description=Wander Around API (FastAPI on 127.0.0.1:8050)
 After=network.target
 
 [Service]
-User=root
-WorkingDirectory=/root/wander
-Environment=PYTHONPATH=/root/wander/src
+User=wander
+Group=wander
+WorkingDirectory=/opt/wander
+Environment=PYTHONPATH=/opt/wander/src
 ExecStart=/usr/bin/python3 -m uvicorn api.main:app --host 127.0.0.1 --port 8050 --no-server-header --proxy-headers --forwarded-allow-ips=127.0.0.1
 Restart=always
 RestartSec=5
 LimitNOFILE=4096
 
 # ── Hardening ─────────────────────────────────────────────────────────
-# Note: ProtectHome=true would block /root; we run from /root/wander, so leave it off.
+# Code lives at /opt/wander (FHS-conformant); /root not touched, so we
+# can enable ProtectHome=true to block any accidental access to user
+# home directories. Service runs as the dedicated unprivileged `wander`
+# user; data is writable under /opt/wander/data and /opt/wander/logs.
 NoNewPrivileges=true
+ProtectHome=true
 ProtectSystem=strict
-ReadWritePaths=/root/wander/data /root/wander/logs
+ReadWritePaths=/opt/wander/data /opt/wander/logs
 PrivateTmp=true
 ProtectKernelTunables=true
 ProtectKernelModules=true

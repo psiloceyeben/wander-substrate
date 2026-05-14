@@ -13,6 +13,7 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi.staticfiles import StaticFiles
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from wander import db as wander_db
@@ -26,6 +27,14 @@ app = FastAPI(
     redoc_url=None,
     openapi_url=None,
 )
+
+# /static/ — self-hosted Three.js + controls. The /world and /4d page modules
+# import these via absolute /static/ URLs (CSP `script-src 'self'` blocks the
+# bare-specifier importmap path that would otherwise need 'unsafe-inline').
+# StaticFiles handles path-traversal safely; do not roll a custom file route.
+_STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+if _STATIC_DIR.is_dir():
+    app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
 
 
 PLACEHOLDER_HTML = """<!doctype html>
@@ -74,7 +83,10 @@ async def health():
 
 
 # ── Day 7-8 demo: procedural building facades + link graph ─────────────
-DATA_DIR = Path("/root/wander/data")
+# DATA_DIR can be overridden via env var; default follows FHS conventions
+# with /opt/wander as the install root and /opt/wander/data as the data dir.
+import os as _os_data
+DATA_DIR = Path(_os_data.environ.get("WANDER_DATA_DIR", "/opt/wander/data"))
 
 DEMO_PAGE = """<!doctype html>
 <html lang="en">
@@ -899,7 +911,7 @@ async def api_category_edges():
         # Return empty obj so /game's chord render shows the "computing…" state
         # cleanly instead of erroring. Run script to populate.
         return JSONResponse({}, status_code=503, headers={"Retry-After": "60"})
-    return JSONResponse(json.loads(p.read_text()), headers={"Cache-Control": "public, max-age=3600"})
+    return JSONResponse(_json.loads(p.read_text()), headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.get("/api/game/layout")
@@ -4129,7 +4141,7 @@ function updateBuildingLabel(c) {
     return;
   }
   const score = c.score >= 0 ? '+' + c.score : c.score;
-  buildingLabelEl.innerHTML = `<b>${c.host}</b><div class="meta">${c.category} · ${c.site_type} · ${c.era} · score ${score}</div>`;
+  buildingLabelEl.innerHTML = `<b>${escapeHtml(c.host)}</b><div class="meta">${escapeHtml(c.category)} · ${escapeHtml(c.site_type)} · ${escapeHtml(c.era)} · score ${score}</div>`;
   buildingLabelEl.classList.add('show');
 }
 
@@ -5009,7 +5021,7 @@ async def fourd_js():
                     headers={"Cache-Control": "no-store"})
 
 
-# Self-hosted Three.js (vendored to /root/wander/lib/) so /4d's importmap doesn't
+# Self-hosted Three.js (vendored to /opt/wander/lib/) so /4d's importmap doesn't
 # depend on a public CDN — eliminates the cold-load tax of fetching 1MB of
 # JavaScript across the Atlantic before the page can render.
 LIB_DIR = Path(__file__).parent.parent / "lib"

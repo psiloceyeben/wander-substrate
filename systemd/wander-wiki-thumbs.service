@@ -5,16 +5,18 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/root/wander
-ExecStart=/usr/bin/python3 /root/wander/scripts/wiki/05_wiki_thumb_render.py --parallelism 2 --batch-size 10 --timeout-ms 15000
+User=wander
+Group=wander
+WorkingDirectory=/opt/wander
+ExecStart=/usr/bin/python3 /opt/wander/scripts/example_wiki/05_wiki_thumb_render.py --parallelism 2 --batch-size 10 --timeout-ms 15000
 Restart=on-failure
 RestartSec=30
 Nice=10
 IOSchedulingClass=best-effort
 IOSchedulingPriority=6
 MemoryMax=4G
-StandardOutput=append:/root/wander/data/wiki/thumbs.log
-StandardError=append:/root/wander/data/wiki/thumbs.log
+StandardOutput=append:/opt/wander/data/wiki/thumbs.log
+StandardError=append:/opt/wander/data/wiki/thumbs.log
 
 [Install]
 WantedBy=multi-user.target
